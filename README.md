@@ -2,6 +2,21 @@
 
 Docker images for SysML v2
 
+## Prerequisites
+
+- Docker
+  - Tested with Ubuntu 20.04 and Docker 20.10
+
+You must run the following commands before using this.
+
+```sh
+# Use `docker` commands without `sudo`
+sudo gpasswd -a $(whoami) docker
+
+# Access display from Docker containers
+xhost +local:
+```
+
 ## Usage
 
 ```sh
@@ -52,7 +67,7 @@ eclipse {
 
 ## License
 
-Since docker images contain the contents in [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release), this repository is published under `LGPL-3.0`.
+Since Docker images contain the contents in [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release), this repository is published under `LGPL-3.0`.
 Also, before using this, you must agree with the `SysML v2 Pilot Implementation Licensing Agreement` below.
 
 ```md
