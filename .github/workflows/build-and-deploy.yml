@@ -2,9 +2,15 @@ name: build-and-deploy
 
 on:
   pull_request:
+    paths:
+      - "data/**"
+      - "Dockerfile*"
   push:
     branches:
       - main
+    paths:
+      - "data/**"
+      - "Dockerfile*"
   workflow_dispatch:
 
 env:
