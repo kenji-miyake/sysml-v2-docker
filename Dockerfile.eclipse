@@ -1,0 +1,60 @@
+FROM ubuntu:20.04
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+## Arguments
+ARG ECLIPSE_VERSION
+ARG SYSML_VERSION
+
+## Libraries
+# hadolint ignore=DL3008
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+  curl \
+  git \
+  graphviz \
+  libswt-gtk-4-jni \
+  openjdk-11-jdk \
+  wget \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+## Eclipse
+RUN mkdir -p /opt/eclipse
+# hadolint ignore=DL3059
+RUN wget -O - --no-check-certificate --progress=bar:force:noscrol \
+  "https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/$ECLIPSE_VERSION/R/eclipse-modeling-$ECLIPSE_VERSION-R-linux-gtk-x86_64.tar.gz&r=1" \
+  | tar -zx -C /opt/eclipse --strip-components 1
+ENV PATH $PATH:/opt/eclipse
+
+## Eclipse Workspace
+RUN mkdir -p /opt/workspace
+COPY data/org.eclipse.ui.ide.prefs /opt/eclipse/configuration/.settings/org.eclipse.ui.ide.prefs
+
+## PlantUML Plugins
+RUN eclipse -application org.eclipse.equinox.p2.director -nosplash \
+  -repository "https://github.com/himi/p2-update-puml-sysmlv2/raw/main/updates" \
+  -installIUs "net.sourceforge.plantuml.ecore.feature.feature.group" \
+  -installIUs "net.sourceforge.plantuml.ecore.feature.source.feature.group" \
+  -installIUs "net.sourceforge.plantuml.feature.feature.group" \
+  -installIUs "net.sourceforge.plantuml.feature.source.feature.group" \
+  -installIUs "net.sourceforge.plantuml.lib.feature.feature.group" \
+  -installIUs "net.sourceforge.plantuml.lib.jlatexmath.feature.feature.group"
+
+## SysML Plugins
+RUN git clone https://github.com/Systems-Modeling/SysML-v2-Release.git -b "$SYSML_VERSION" --depth=1 /opt/SysML-v2-Release
+# hadolint ignore=DL3059
+RUN eclipse -application org.eclipse.equinox.p2.director -nosplash \
+  -repository "https://download.eclipse.org/releases/$ECLIPSE_VERSION/" \
+  -repository 'jar:file:/opt/SysML-v2-Release/install/eclipse/org.omg.sysml.site.zip!/' \
+  -installIUs "org.omg.sysml.feature.feature.group" \
+  -installIUs "org.omg.sysml.plantuml.feature.feature.group"
+
+## Dependent Projects
+RUN wget -O /opt/eclipse/plugins/com.seeq.eclipse.importprojects_1.4.0.jar --progress=bar:force:noscrol \
+  "https://github.com/seeq12/eclipse-import-projects-plugin/raw/master/jar/com.seeq.eclipse.importprojects_1.4.0.jar"
+COPY data/add-project.sh /add-project.sh
+RUN /add-project.sh /opt/SysML-v2-Release/sysml.library
+
+## Entry Point
+WORKDIR /opt
+COPY data/entrypoint.sh /entrypoint.sh
+CMD ["/entrypoint.sh"]
