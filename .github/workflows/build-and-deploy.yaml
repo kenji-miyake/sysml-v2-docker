@@ -5,12 +5,14 @@ on:
     paths:
       - "data/**"
       - "Dockerfile*"
+      - ".github/workflows/build-and-deploy.yaml"
   push:
     branches:
       - main
     paths:
       - "data/**"
       - "Dockerfile*"
+      - ".github/workflows/build-and-deploy.yaml"
   workflow_dispatch:
 
 env:
