@@ -57,11 +57,6 @@ jobs:
         run: |
           echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
 
-      - name: Run hadolint
-        run: |
-          brew install hadolint
-          hadolint ./Dockerfile.eclipse
-
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
 
