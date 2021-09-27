@@ -34,20 +34,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set environment variables for pull_request and push
+      - name: Set versions for pull_request and push
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "ECLIPSE_VERSION=${{ env.LATEST_ECLIPSE_VERSION }}" >> $GITHUB_ENV
           echo "SYSML_VERSION=${{ env.LATEST_SYSML_VERSION }}" >> $GITHUB_ENV
 
-          echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:latest,${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
-
-      - name: Set environment variables for workflow_dispatch
+      - name: Set versions for workflow_dispatch
         if: github.event_name == 'workflow_dispatch'
         run: |
           echo "ECLIPSE_VERSION=${{ github.event.inputs.eclipse_version }}" >> $GITHUB_ENV
           echo "SYSML_VERSION=${{ github.event.inputs.sysml_version }}" >> $GITHUB_ENV
 
+      - name: Set image tags for pull_request and push
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:latest,${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
+
+      - name: Set image tags for workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
           echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
 
       - name: Run hadolint
