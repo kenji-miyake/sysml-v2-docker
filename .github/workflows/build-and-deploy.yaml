@@ -18,9 +18,10 @@ on:
       eclipse_version:
         description: "Eclipse version(e.g. 2021-03)"
         default: 2021-03
-        required: false
+        required: true
       sysml_version:
         description: "SysML version(e.g. 2021-08)"
+        default: 2021-08
         required: true
 env:
   GHCR_TAG_BASE: ghcr.io/${{ github.repository }}
@@ -34,20 +35,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set environment variables for pull_request and push
+      - name: Set versions for pull_request and push
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "ECLIPSE_VERSION=${{ env.LATEST_ECLIPSE_VERSION }}" >> $GITHUB_ENV
           echo "SYSML_VERSION=${{ env.LATEST_SYSML_VERSION }}" >> $GITHUB_ENV
 
-          echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:latest,${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
-
-      - name: Set environment variables for workflow_dispatch
+      - name: Set versions for workflow_dispatch
         if: github.event_name == 'workflow_dispatch'
         run: |
           echo "ECLIPSE_VERSION=${{ github.event.inputs.eclipse_version }}" >> $GITHUB_ENV
           echo "SYSML_VERSION=${{ github.event.inputs.sysml_version }}" >> $GITHUB_ENV
 
+      - name: Set image tags for pull_request and push
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:latest,${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
+
+      - name: Set image tags for workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
           echo "ECLIPSE_IMAGE_TAGS=${{ env.GHCR_TAG_BASE }}/eclipse:${{ env.SYSML_VERSION }}" >> $GITHUB_ENV
 
       - name: Run hadolint
