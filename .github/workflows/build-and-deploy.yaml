@@ -21,7 +21,7 @@ on:
         required: true
       sysml_version:
         description: "SysML version(e.g. 2021-08)"
-        default: 2021-08
+        default: 2021-10
         required: true
 env:
   GHCR_TAG_BASE: ghcr.io/${{ github.repository }}
