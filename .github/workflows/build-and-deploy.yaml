@@ -26,7 +26,7 @@ on:
 env:
   GHCR_TAG_BASE: ghcr.io/${{ github.repository }}
   LATEST_ECLIPSE_VERSION: 2021-03
-  LATEST_SYSML_VERSION: 2021-09
+  LATEST_SYSML_VERSION: 2021-10
 
 jobs:
   build-and-deploy:
